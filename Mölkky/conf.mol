@@ -1,0 +1,7 @@
+author = creeperdeking
+email = alexis.gros99@gmail.com
+
+default.key.up = up
+default.key.down = down
+default.key.left = left
+default.key.right = right
