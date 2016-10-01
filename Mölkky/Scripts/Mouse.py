@@ -3,72 +3,54 @@ from General import *
 #Handle everything about mouse, including velocity computing for the möllky
 class Mouse:
 	def __init__(self):
+		bge.logic.mouse.visible = 1
+		
 		#Constants:
-		self.angleFactor = 1
-		self.rayMouse = 300
-		self.minMouse = 20
-		
+		self.sensitivity = Vector((.5, 1))
+		self.widthDivHeight = (bge.render.getWindowWidth()/bge.render.getWindowHeight())
+		self.minMouse = .1
+		self.vectorTempo = 3 #The number of mouse events between the two points of the vector
+
 		#Variables:
-		self.mousePos = Vector((logic.mouse.inputs[bge.events.MOUSEX].values[-1], logic.mouse.inputs[bge.events.MOUSEY].values[-1]))
-		self.oldMousePos = self.mousePos
-		
-		self.oldValueMousePos = Vector((self.mousePos.x, self.mousePos.y))
-		self.centerMouse = Vector((bge.logic.mouse.inputs[bge.events.MOUSEX].values[0], bge.logic.mouse.inputs[bge.events.MOUSEY].values[0]))
+		logic.mouse.position = (0.5, 0.5)
+		self.relPos = Vector(((logic.mouse.position[0]-0.5)*self.widthDivHeight*2, (-logic.mouse.position[1]+0.5)*2))
+		self.oldRelPos = [self.relPos] * self.vectorTempo #the mouse position history
+		print(self.relPos)
 	
 	#Get the last mouse position
 	def updateMousePos(self):
-		self.mousePos = Vector((bge.logic.mouse.inputs[bge.events.MOUSEX].values[-1], -bge.logic.mouse.inputs[bge.events.MOUSEY].values[-1]))
+		self.relPos.x = (logic.mouse.position[0]-0.5)*(bge.render.getWindowWidth()/bge.render.getWindowHeight())*2
+		self.relPos.y = (-logic.mouse.position[1]+0.5)*2
 		
-		self.locPos = self.mousePos - self.centerMouse
-		
-		#Verify the mouse cursor is into his authorized zone, else displace it to his old position:		
-		if sqrt(self.locPos.x**2 + self.locPos.y**2) > self.rayMouse or self.locPos.y*Utils.getSign(self.locPos.y) < self.locPos.x or self.locPos.y*Utils.getSign(self.locPos.y) < -self.locPos.x:
-			if self.locPos.x > self.minMouse or self.locPos.x < -self.minMouse or self.locPos.y > self.minMouse or self.locPos.y < -self.minMouse:
-				self.addToLocalMousePos((self.oldValueMousePos.x-self.mousePos.x), (self.oldValueMousePos.y - self.mousePos.y))
-		
-		self.oldValueMousePos = Vector((self.mousePos.x, self.mousePos.y))
-	
-	#Get the position in local coordinates, return a value between 0 and 1
-	def getLocalPos(self):
-		self.updateMousePos()
-		self.locPos = self.mousePos - self.centerMouse
-		return self.locPos
-		
-	#Add a relative position to the local mouse position
-	def addToLocalMousePos(self, x, y):
-		self.centerMouse.x -= x
-		self.centerMouse.y -= y
-		
-	#Change the actual mouse position in the local coordinates
-	"""def changeLocalPos(self, x, y):
-		addToLocalPos(-(mousePos.x - x), -(mousePos.y - y))"""
+		#Verify the mouse cursor is into his authorized zone, else displace it to his old position:
+		if sqrt(self.relPos.x**2 + self.relPos.y**2) > 1 or self.relPos.x > self.relPos.y*Utils.getSign(self.relPos.y) or self.relPos.x < -self.relPos.y*Utils.getSign(self.relPos.y):
+			if self.relPos.x > self.minMouse or self.relPos.x < -self.minMouse or self.relPos.y > self.minMouse or self.relPos.y < -self.minMouse:
+				self.relPos = self.oldRelPos[-1]
+				
+		logic.mouse.position = (self.relPos.x/2/(bge.render.getWindowWidth()/bge.render.getWindowHeight())+0.5, -self.relPos.y/2 +0.5 )  
+		tmpMouse = list(self.oldRelPos)
+		tmpMouse.append(self.relPos)
+
+		for i in range(1, len(tmpMouse)):
+			self.oldRelPos[i-1] = Vector(tmpMouse[i])
 	
 	#Check were is the mouse, update his position and return the actual vector of the molkky velocity
 	def getVelocityVector(self):
-		self.updateMousePos()
-		print("!!! Computing the velocity vector !!!")
-		print(bge.logic.mouse.inputs[bge.events.MOUSEX].values)
+		print("Computing the velocity vector")
+		speed2D = Vector((0,0))
 		#Compute the current actual 2D speed of the mouse (m/s)
-		speed2D = Vector(((self.mousePos.x - bge.logic.mouse.inputs[bge.events.MOUSEX].values[0])/self.rayMouse, (bge.logic.mouse.inputs[bge.events.MOUSEY].values[-1] - bge.logic.mouse.inputs[bge.events.MOUSEY].values[0])/self.rayMouse*-1)) * logic.logicFPS
-		
-		print(self.mousePos.y)
-		print(bge.logic.mouse.inputs[bge.events.MOUSEY].values[0])
-		print(bge.logic.mouse.inputs[bge.events.MOUSEY].values[0] + self.mousePos.y)
+		speed2D.x = (self.relPos.x-self.oldRelPos[0].x) * self.sensitivity.x * logic.logicFPS / self.vectorTempo
+		speed2D.y = (self.relPos.y-self.oldRelPos[0].y) * self.sensitivity.y * logic.logicFPS / self.vectorTempo
 		print(speed2D)
-		
-		X = sqrt((self.getLocalPos().x/self.rayMouse)**2 + (self.getLocalPos().y/self.rayMouse)**2)*pi
-		#print(X)
-		
+		X = sqrt((self.relPos.x)**2 + (self.relPos.y)**2)*pi
 		#Compute the 2D velocity curve tangent vector with cos interpolation
-		velocityCurveVector = Vector((-sin(X), 1, cos(X)))
-		returned = Vector((sqrt(speed2D.x**2+speed2D.y**2)*velocityCurveVector.x*-Utils.getSign(speed2D.x), speed2D.y*velocityCurveVector.y, sqrt(speed2D.x**2+speed2D.y**2)*velocityCurveVector.z*-1))
-		#print(velocityCurveVector)
-		#print(returned)
+		velocityCurve = Vector((1, -sin(X), cos(X)))
 		
+		returned = Vector((speed2D.x*velocityCurve.x, -speed2D.y*velocityCurve.y, sqrt(speed2D.x**2+speed2D.y**2)*velocityCurve.z))
+		print(returned)
 		#Multiply vectors:
 		return returned
 	
 	#Depending of the origin we give to it, return the current coordinates of the molkky
 	def getMolkkyPosition(self, origin):
-		return Vector((self.getLocalPos().x/self.rayMouse, (self.getLocalPos().y)/self.rayMouse, 1-sin((1-sqrt((self.getLocalPos().x/self.rayMouse)**2 + (self.getLocalPos().y/self.rayMouse)**2))*(pi/2)))) + origin
-	
+		return Vector((self.relPos.x, self.relPos.y, sin(-sqrt(((self.relPos.x)**2 + (self.relPos.y**2))/2+0.5)*pi)+1)) + origin

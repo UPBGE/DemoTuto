@@ -5,6 +5,16 @@ def getSign(x):
 	return -1
 
 from bge import *
+import bge.logic as logic
+
+class Timer:
+	def __init__(self, name = "timer"):
+		print("Init the timer")
+		logic.getCurrentController().owner["timer"]
+	def get(self):
+		return logic.getCurrentController().owner["timer"]
+	def set(self, value):
+		logic.getCurrentController().owner["timer"] = value
 
 #get the word_num word in the chaine chain
 #Optional: reverse: if == 1, then begin by the end

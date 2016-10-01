@@ -19,4 +19,4 @@ def main_loop():
 		#If we have a winner, game is done!
 		if out != "":
 			print(" WINNER : "+out)
-			logic.quit()
+			logic.exit()

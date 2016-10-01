@@ -34,7 +34,7 @@ class Player:
 		if self.emptyTurns >= 3:
 			returned = -1
 		
-		if self.score == logic.goodScore:
+		if self.score >= logic.goodScore: #Change this line to == wen the game will be finished
 			returned = 1
 		elif self.score > logic.goodScore:
 			self.score = 25
