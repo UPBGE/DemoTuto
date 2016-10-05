@@ -7,7 +7,10 @@ import blf
 
 #The Text holding class
 class Text:
-	def __init__(self, text, fontPath, position, size, normPos = -1, normSize = -1):
+	def __init__(self):
+		self.text = ""
+		
+	def consAbs(self, text, fontPath, position, size, normPos = -1, normSize = -1):
 		self.text = text
 		self.position = position
 		self.size = size
@@ -29,7 +32,13 @@ class Text:
 		self.renderSize = Vector((render.getWindowWidth(), render.getWindowHeight()))
 		logic.texts.append(self)
 		self.updateFont()
-		
+	
+	#This function take an object to help positionning the Text.
+	def consRel(self, text, fontPath, objPos, camPos, camScale, size = Vector((40, 40))):
+		relativeDist = objPos - camPos
+		ratio = Vector((relativeDist.x / camScale, relativeDist.y / camScale*render.getWindowWidth()/render.getWindowHeight())) + Vector((0.5, 0.5))
+		ratio.y = 1 - ratio.y
+		self.consAbs(text, fontPath, ratio, size)
 		
 	def updateFont(self):
 		# create a new font object, use external ttf file

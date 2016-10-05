@@ -14,8 +14,11 @@ class Player:
 		self.pinFallen = []
 		self.emptyTurns = 0 #Count the number of turns without points
 		
-		self.textName = Text(self.name, "Russian.ttf", Vector((0.0, 0.1+number*0.1)), Vector((0.1, 0.05)))
-		self.textScore = Text(str(self.score), "Russian.ttf", Vector((0.3, 0.1+number*0.1)), Vector((0.1, 0.05)))
+		self.textName = Text()
+		self.textScore = Text()
+		self.textName.consRel(self.name, "Russian.ttf", overlayer1.objects["playerNameText"].worldPosition-Vector((0, number*0.1*6, 0)), overlayer1.objects["Camera"].worldPosition, 6, Vector((0.1, 0.05)))
+		self.textScore.consRel(str(self.score), "Russian.ttf", overlayer1.objects["playerScoreText"].worldPosition-Vector((0, number*0.1*6, 0)), overlayer1.objects["Camera"].worldPosition, 6, Vector((0.1, 0.05)))
+		
 		print("  Player "+name+" has been successfully created")
 		
 	def pinFall(self, pin):
