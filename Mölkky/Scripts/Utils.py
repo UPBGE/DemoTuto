@@ -1,11 +1,13 @@
+# import stand alone modules
+from bge import *
+import bge.logic as logic
+from General import *
+
 #Return the sign of x: 1 or -1
 def getSign(x):
 	if x >= 0:
 		return 1
 	return -1
-
-from bge import *
-import bge.logic as logic
 
 class Timer:
 	def __init__(self, name = "timer"):
@@ -15,6 +17,9 @@ class Timer:
 		return logic.getCurrentController().owner["timer"]
 	def set(self, value):
 		logic.getCurrentController().owner["timer"] = value
+	
+
+
 
 #get the word_num word in the chaine chain
 #Optional: reverse: if == 1, then begin by the end

@@ -8,7 +8,7 @@ def main():
 	sys.path.append(logic.expandPath("//Scripts"))
 	import Game
 	import Player
-	logic.game = Game.Game([Player.Player("Roosendal"), Player.Player("Toon")])
+	logic.game = Game.Game([Player.Player(0, "Roosendal"), Player.Player(1, "Toon")])
 	logic.begin = 1
 	logic.game.initGame()
 			  
@@ -19,4 +19,4 @@ def main_loop():
 		#If we have a winner, game is done!
 		if out != "":
 			print(" WINNER : "+out)
-			logic.exit()
+			logic.endGame()
