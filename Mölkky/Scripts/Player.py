@@ -16,8 +16,11 @@ class Player:
 		
 		self.textName = Text()
 		self.textScore = Text()
-		self.textName.consRel(self.name, "Russian.ttf", overlayer1.objects["playerNameText"].worldPosition-Vector((0, number*0.1*6, 0)), overlayer1.objects["Camera"].worldPosition, 6, Vector((0.1, 0.05)))
-		self.textScore.consRel(str(self.score), "Russian.ttf", overlayer1.objects["playerScoreText"].worldPosition-Vector((0, number*0.1*6, 0)), overlayer1.objects["Camera"].worldPosition, 6, Vector((0.1, 0.05)))
+		nameScreen = overlayer1.objects["playerNameText"]
+		scoreScreen = overlayer1.objects["playerScoreText"]
+		camera = overlayer1.objects["Camera"]
+		self.textName.consRel(self.name, "Russian.ttf", nameScreen, camera, -Vector((0, number*0.1*6, 0)), 10)
+		self.textScore.consRel(str(self.score), "Russian.ttf", scoreScreen, camera, -Vector((0, number*0.1*6, 0)), 1, Vector((0.1, 0.1)))
 		
 		print("  Player "+name+" has been successfully created")
 		

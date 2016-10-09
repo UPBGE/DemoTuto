@@ -51,12 +51,12 @@ class Game:
 		
 		self.reticuleXY = overlayer1.objects["reticuleXY"]
 		self.reticuleXZ = overlayer1.objects["reticuleXZ"]
+		overlayer1.objects["curveXZ"].localScale.y *= self.maxDotValue
 		self.flagXY = overlayer1.objects["flagXY"]
 		self.flagXZ = overlayer1.objects["flagXZ"]
 		
 		self.molkky = scene.objects["Mölkky"]
 		self.puppet = scene.objects["Mölkky_puppet"]
-		#print(self.molkky.game.physics_type)
 		self.origin = scene.objects["Origin"]
 		self.reference = scene.objects["reference"].worldPosition
 		self.pinList = []

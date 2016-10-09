@@ -32,21 +32,36 @@ class Text:
 		self.renderSize = Vector((render.getWindowWidth(), render.getWindowHeight()))
 		logic.texts.append(self)
 		self.updateFont()
-	
+
 	#This function take an object to help positionning the Text.
-	def consRel(self, text, fontPath, objPos, camPos, camScale, size = Vector((40, 40))):
-		relativeDist = objPos - camPos
-		ratio = Vector((relativeDist.x / camScale, relativeDist.y / camScale*render.getWindowWidth()/render.getWindowHeight())) + Vector((0.5, 0.5))
+	def consRel(self, text, fontPath, obj, cam, objPosModifier = Vector((0,0)), maxNumChar = 1, size = Vector((0.0, 0.0))):
+		if maxNumChar == 0:
+			print("Warning, maxNumChar = 0 in Text:consRel, replacing it by 1")
+			maxNumChar = 1
+			
+		rend = cam.ortho_scale*render.getWindowWidth()/render.getWindowHeight()
+		
+		objSize = Vector((obj.cullingBox.max.x-obj.cullingBox.min.x, obj.cullingBox.max.y-obj.cullingBox.min.y))
+		print(objSize)
+		if size.x == 0:
+			size.x = objSize.x/cam.ortho_scale#/maxNumChar
+			#print("size.x: "+str(size.x))
+		elif size.y == 0:
+			size.y = objSize.y/rend
+			#print("size.y: "+str(size.y))
+		
+		relativeDist = obj.worldPosition + objPosModifier - cam.worldPosition
+		ratio = Vector((relativeDist.x / cam.ortho_scale, relativeDist.y / rend)) + Vector((0.5, 0.5))
 		ratio.y = 1 - ratio.y
 		self.consAbs(text, fontPath, ratio, size)
-		
+
 	def updateFont(self):
 		# create a new font object, use external ttf file
 		if self.fontPath[0] != '/' or self.fontPath[0] != '\\':
 			self.fontPath = logic.expandPath('//'+self.fontPath)
 		# store the font indice - to use later
 		self.fontID = blf.load(self.fontPath)
-	
+
 	def write(self):
 		# OpenGL setup
 		bgl.glMatrixMode(bgl.GL_PROJECTION)
